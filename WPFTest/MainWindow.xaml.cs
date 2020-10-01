@@ -2,15 +2,16 @@
 using System.Net;
 using System.Net.Mail;
 
-namespace ConsoleTests
+namespace WPFTest
 {
-    class Program
+    public partial class MainWindow
     {
-        static void Main(string[] args)
-        {
+        public MainWindow() => InitializeComponent();
 
+        private void Button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
             var to = new MailAddress("k3incho@inbox.ru", "Костя");           //кому отправляем
-            var from = new MailAddress("8_klukovka_8@inbox.ru", "Костя");    //от кого отправляем
+            var from = new MailAddress("konstantin.tikhomolov@yandex.ru", "Костя");    //от кого отправляем
 
             var message = new MailMessage(from, to);    //создаем почтовое отправление
             //var msg = new MailAddress("user@server.ru", "qwe@ASD.ru");
@@ -19,20 +20,19 @@ namespace ConsoleTests
             message.Body = "Тело текстового письма + " + DateTime.Now;
 
             //создаем клиента SMTP почты, через который будет отправляться почта
-            var client = new SmtpClient("smtp.mail.ru"/*, "smtp.yandex.ru", 587 */);
+            //var client = new SmtpClient("smtp.mail.ru", 465);
+            var client = new SmtpClient("smtp.yandex.ru", 25);
             client.EnableSsl = true;
 
             //указываем учетные данные почты клиента
             client.Credentials = new NetworkCredential
             {
-                UserName = "user_name",
-                Password = "PassWord!"
+                UserName = LoginEdit.Text,
+                SecurePassword = PasswordEdit.SecurePassword
             };
 
             //отправляем сообщение
             client.Send(message);
-
-            //Console.WriteLine("Hello World!");
         }
     }
 }
