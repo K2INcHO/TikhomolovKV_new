@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFTest"
         xmlns:vm="clr-namespace:WPFTest.ViewModels"
+        xmlns:commands="clr-namespace:WPFTest.Infrastructure.Commands"
         mc:Ignorable="d"
         Title="{Binding Title}" 
         Topmost="{Binding IsChecked, ElementName=IsWindowTopMost}"
@@ -46,6 +47,15 @@
                   Name="IsWindowTopMost"/>
 
         <Button Content="Close Window" VerticalAlignment="Top" HorizontalAlignment="Left"
-                Margin="20,60"/>
+                Margin="20,60">
+            <Button.Command>
+                <commands:CloseWindowCommand/>
+            </Button.Command>
+        </Button>
+
+        <Button Content="Hello World!" VerticalAlignment="Top" HorizontalAlignment="Left"
+                Margin="120,60" Command="{Binding ShowDialogCommand}">
+        </Button>
+
     </Grid>
 </Window>
