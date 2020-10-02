@@ -7,11 +7,14 @@ using MailSender.Models;
 using MailSender.ViewModels.Base;
 using MailSender.Infrastructure.Commands; //нужно чтобы подцепить LambdaCommand
 using System.Linq;
+using MailSender.lib.Interfaces;
 
 namespace MailSender.ViewModels
 {
     class MainWindowViewModel : ViewModel
     {
+        private readonly IMailService _MailService;
+
         public string _Title = "Тестовое окно";
 
         public string Title
@@ -142,13 +145,42 @@ namespace MailSender.ViewModels
 
                     //MessageBox.Show("Удаление сервера!", "Управление серверами");
                 }
+        #endregion
+
+            #region Команда_4 - SendMailCommand
+                private ICommand _SendMailCommand;
+
+                public ICommand SendMailCommand => _SendMailCommand
+                    ??= new LambdaCommand(OnSendMailCommandExecuted, CanSendMailCommandExecute);
+
+                private bool CanSendMailCommandExecute(object p) 
+                {
+                    if (SelectedServer is null) return false;
+                    if (SelectedSender is null) return false;
+                    if (SelectedRecipient is null) return false;
+                    if (SelectedMessage is null) return false;
+                    return true;
+                }
+
+                //основное действие, выполняемое командой
+                private void OnSendMailCommandExecuted(object p)
+                {
+                    var server = SelectedServer;
+                    var sender = SelectedSender;
+                    var recipient = SelectedRecipient;
+                    var message = SelectedMessage;
+                    var mail_sender = _MailService.GetSender(server.Address, server.Port, server.UseSSL, server.Login, server.Password);
+
+                    mail_sender.Send(sender.Address, recipient.Address, message.Subject, message.Body);
+                }
             #endregion
 
         #endregion
 
         //инициализируем эти свойства в конструкторе, чтобы туда попали эти данные
-        public MainWindowViewModel()
+        public MainWindowViewModel(IMailService MailService)
         {
+            _MailService = MailService;
             Servers = new ObservableCollection<Server>(TestData.Servers);
             Senders = new ObservableCollection<Sender>(TestData.Senders);
             Recipients = new ObservableCollection<Recipient>(TestData.Recipients);
