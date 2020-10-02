@@ -24,6 +24,8 @@
             </MenuItem>
             <MenuItem Header="Сервис">
                 <MenuItem Header="Параметры"/>
+                <Separator/>
+                <MenuItem Header="Отправка почты" Command="{Binding SendMailCommand}"/>
             </MenuItem>
             <MenuItem Header="Помощь">
                 <MenuItem Header="О программе"/>
@@ -126,7 +128,7 @@
                                     </Style>
                                 </StackPanel.Resources>
 
-                                <Button ToolTip="Отправить сразу">
+                                <Button ToolTip="Отправить сразу" Command="{Binding SendMailCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <fa:ImageAwesome Icon="Regular_Envelope" Height="12" Foreground="DarkBlue"/>
                                         <TextBlock Text="Отправить" Margin="5,0,0,0"/>
@@ -267,7 +269,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Column="0" Grid.Row="0" Text="Число отправленных писем:"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" Text="5"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Statistic.SendMessagesCount}"/>
 
                     <TextBlock Grid.Column="0" Grid.Row="1" Text="Число отправителей в базе:"/>
                     <TextBlock Grid.Column="1" Grid.Row="1" Text="5"/>
