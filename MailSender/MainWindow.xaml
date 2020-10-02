@@ -10,7 +10,8 @@
         xmlns:local="clr-namespace:MailSender"
         xmlns:System="clr-namespace:System;assembly=System.Runtime" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d"
         x:Class="MailSender.MainWindow"
-        Title="Приложение по отправке электронной почты" Height="450" Width="800">
+        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
+        Title="{Binding Title}" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Файл">
@@ -43,7 +44,8 @@
                         <ToolBar Header="Сервера" Band="0" BandIndex="0">
                             <ComboBox x:Name="ServersList" Margin="26,0,0,0" MinWidth="120" MaxWidth="200"
                                       SelectedIndex="0"
-                                      ItemsSource="{x:Static data:TestData.Servers}"
+                                      ItemsSource="{Binding Servers}"
+                                      SelectedItem="{Binding SelectedServer}"
                                       DisplayMemberPath="Address"/>
                             <Button ToolTip="Добавить">
                                 <fa:ImageAwesome Icon="Solid_PlusCircle" Height="12" Foreground="Green"/>
@@ -54,7 +56,8 @@
                         <ToolBar Header="Отправители" Band="1">
                             <ComboBox x:Name="SendersList" MinWidth="120" MaxWidth="200"
                                       SelectedIndex="0"
-                                      ItemsSource="{x:Static data:TestData.Senders}">
+                                      SelectedItem="{Binding SelectedSender}"
+                                      ItemsSource="{Binding Senders}">
                                 <ComboBox.ItemTemplate >
                                     <DataTemplate DataType="m:Sender">
                                         <StackPanel Orientation="Horizontal" >
@@ -85,7 +88,8 @@
                         </ToolBar>
                     </ToolBarTray>
                     <GroupBox Header="Список получателей">
-                        <DataGrid x:Name="RecipientsList" ItemsSource="{x:Static data:TestData.Recipients}"
+                        <DataGrid x:Name="RecipientsList" ItemsSource="{Binding Recipients}"
+                                  SelectedItem="{Binding SelectedRecipient}"
                                   AutoGenerateColumns="False"
                                   GridLinesVisibility="Vertical"
                                   AlternatingRowBackground="LightBlue"
@@ -119,7 +123,7 @@
                                     </Style>
                                 </StackPanel.Resources>
 
-                                <Button ToolTip="Отправить сразу" Click="OnSendButtonClick">
+                                <Button ToolTip="Отправить сразу">
                                     <StackPanel Orientation="Horizontal">
                                         <fa:ImageAwesome Icon="Regular_Envelope" Height="12" Foreground="DarkBlue"/>
                                         <TextBlock Text="Отправить" Margin="5,0,0,0"/>
@@ -209,14 +213,16 @@
             <TabItem Header="Письма" x:Name="tabLetters">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
+                        <ColumnDefinition Width="36.667" MaxWidth="400"/>
+                        <ColumnDefinition Width="163.333"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="Список писем">
-                        <ListBox x:Name="MessagesList" ItemsSource="{x:Static data:TestData.Messages}" 
+                    <GroupBox Grid.Column="0" Header="Список писем" Grid.ColumnSpan="2">
+                        <ListBox x:Name="MessagesList" ItemsSource="{Binding Messages}" 
+                                 SelectedItem="{Binding SelectedMessage}"
                                  DisplayMemberPath="Subject"/>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="Редактор">
+                    <GroupBox Grid.Column="2" Header="Редактор">
                         <DockPanel>
                             <GroupBox Header="Заголовок" DockPanel.Dock="Top">
                                 <TextBox x:Name="letterTitle"
