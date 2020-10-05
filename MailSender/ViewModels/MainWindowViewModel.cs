@@ -3,7 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 using MailSender.Data;
-using MailSender.Models;
+using MailSender.lib.Models;
 using MailSender.ViewModels.Base;
 using MailSender.Infrastructure.Commands; //нужно чтобы подцепить LambdaCommand
 using System.Linq;
