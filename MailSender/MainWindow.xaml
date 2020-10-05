@@ -6,7 +6,8 @@
         xmlns:fa="http://schemas.fontawesome.com/icons/"
         xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
         xmlns:data="clr-namespace:MailSender.Data"
-        xmlns:m="clr-namespace:MailSender.Models"
+        xmlns:m="clr-namespace:MailSender.Models" 
+        xmlns:v="clr-namespace:MailSender.Views"
         xmlns:local="clr-namespace:MailSender"
         xmlns:System="clr-namespace:System;assembly=System.Runtime" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d"
         x:Class="MailSender.MainWindow"
@@ -92,20 +93,11 @@
                             <Button fa:Awesome.Content="Regular_TrashAlt" Foreground="Red" ToolTip="Удалить"/>
                         </ToolBar>
                     </ToolBarTray>
-                    <GroupBox Header="Список получателей">
-                        <DataGrid x:Name="RecipientsList" ItemsSource="{Binding Recipients}"
-                                  SelectedItem="{Binding SelectedRecipient}"
-                                  AutoGenerateColumns="False"
-                                  GridLinesVisibility="Vertical"
-                                  AlternatingRowBackground="LightBlue"
-                                  VerticalGridLinesBrush="Gray">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" MinWidth="30"/>
-                                <DataGridTextColumn Header="Имя" Width="*" Binding="{Binding Name}"/>
-                                <DataGridTextColumn Header="Адрес" MinWidth="160" Binding="{Binding Address}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
+
+                    <Grid>
+                        <v:RecipientsView/>
+                    </Grid>
+                    
                 </DockPanel>
             </TabItem>
 

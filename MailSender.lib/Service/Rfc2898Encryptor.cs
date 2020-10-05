@@ -39,7 +39,7 @@ namespace MailSender.lib.Service
         public string Encrypt(string str, string Password)
         {
             var encoding = Encoding ?? Encoding.UTF8;
-            var bytes = Encoding.UTF8.GetBytes(str);
+            var bytes = encoding.GetBytes(str);
             var crypted_bytes = Encrypt(bytes, Password);
             return Convert.ToBase64String(crypted_bytes);
         }
@@ -61,7 +61,7 @@ namespace MailSender.lib.Service
             var crypted_bytes = Convert.FromBase64String(str);
             var bytes = Decrypt(crypted_bytes, Password);
             var encoding = Encoding ?? Encoding.UTF8;
-            return Encoding.UTF8.GetString(bytes);
+            return encoding.GetString(bytes);
         }
 
         public byte[] Decrypt(byte[] data, string Password)

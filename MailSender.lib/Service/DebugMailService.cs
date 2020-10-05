@@ -5,6 +5,13 @@ namespace MailSender.lib.Service
 {
     public class DebugMailService : IMailService
     {
+        private readonly IEncryptorService _EncryptorService;
+
+        public DebugMailService(IEncryptorService EncryptorService)
+        {
+            _EncryptorService = EncryptorService;
+        }
+
         public IMailSender GetSender(string Server, int Port, bool SSL, string Login, string Password)
         {
             return new DebugMailSender(Server, Port, SSL, Login, Password);
