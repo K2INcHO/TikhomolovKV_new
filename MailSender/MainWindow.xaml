@@ -6,11 +6,14 @@
         xmlns:fa="http://schemas.fontawesome.com/icons/"
         xmlns:toolkit="http://schemas.microsoft.com/wpf/2008/toolkit"
         xmlns:data="clr-namespace:MailSender.Data"
-        xmlns:m="clr-namespace:MailSender.Models"
+        xmlns:m="clr-namespace:MailSender.lib.Models;assembly=MailSender.lib"
+        xmlns:v="clr-namespace:MailSender.Views"
         xmlns:local="clr-namespace:MailSender"
-        xmlns:System="clr-namespace:System;assembly=System.Runtime" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime" 
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" mc:Ignorable="d"
         x:Class="MailSender.MainWindow"
-        Title="Приложение по отправке электронной почты" Height="450" Width="800">
+        DataContext="{Binding MainWindowModel, Source={StaticResource Locator}}"
+        Title="{Binding Title}" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Файл">
@@ -23,6 +26,8 @@
             </MenuItem>
             <MenuItem Header="Сервис">
                 <MenuItem Header="Параметры"/>
+                <Separator/>
+                <MenuItem Header="Отправка почты" Command="{Binding SendMailCommand}"/>
             </MenuItem>
             <MenuItem Header="Помощь">
                 <MenuItem Header="О программе"/>
@@ -43,18 +48,23 @@
                         <ToolBar Header="Сервера" Band="0" BandIndex="0">
                             <ComboBox x:Name="ServersList" Margin="26,0,0,0" MinWidth="120" MaxWidth="200"
                                       SelectedIndex="0"
-                                      ItemsSource="{x:Static data:TestData.Servers}"
+                                      ItemsSource="{Binding Servers}"
+                                      SelectedItem="{Binding SelectedServer}"
                                       DisplayMemberPath="Address"/>
-                            <Button ToolTip="Добавить">
+                            <Button ToolTip="Добавить" Command="{Binding CreateNewServerCommand}">
                                 <fa:ImageAwesome Icon="Solid_PlusCircle" Height="12" Foreground="Green"/>
                             </Button>
-                            <Button fa:Awesome.Content="Solid_Edit" Foreground="DarkOrange" ToolTip="Редактировать"/>
-                            <Button fa:Awesome.Content="Regular_TrashAlt" Foreground="Red" ToolTip="Удалить"/>
+                            <Button fa:Awesome.Content="Solid_Edit" Foreground="DarkOrange" ToolTip="Редактировать"
+                                    Command="{Binding EditServerCommand}"
+                                    CommandParameter="{Binding SelectedServer}"/>
+                            <Button fa:Awesome.Content="Regular_TrashAlt" Foreground="Red" ToolTip="Удалить"
+                                    Command="{Binding DeleteServerCommand}"/>
                         </ToolBar>
                         <ToolBar Header="Отправители" Band="1">
                             <ComboBox x:Name="SendersList" MinWidth="120" MaxWidth="200"
                                       SelectedIndex="0"
-                                      ItemsSource="{x:Static data:TestData.Senders}">
+                                      SelectedItem="{Binding SelectedSender}"
+                                      ItemsSource="{Binding Senders}">
                                 <ComboBox.ItemTemplate >
                                     <DataTemplate DataType="m:Sender">
                                         <StackPanel Orientation="Horizontal" >
@@ -84,19 +94,16 @@
                             <Button fa:Awesome.Content="Regular_TrashAlt" Foreground="Red" ToolTip="Удалить"/>
                         </ToolBar>
                     </ToolBarTray>
-                    <GroupBox Header="Список получателей">
-                        <DataGrid x:Name="RecipientsList" ItemsSource="{x:Static data:TestData.Recipients}"
-                                  AutoGenerateColumns="False"
-                                  GridLinesVisibility="Vertical"
-                                  AlternatingRowBackground="LightBlue"
-                                  VerticalGridLinesBrush="Gray">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID" MinWidth="30"/>
-                                <DataGridTextColumn Header="Имя" Width="*" Binding="{Binding Name}"/>
-                                <DataGridTextColumn Header="Адрес" MinWidth="160" Binding="{Binding Address}"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <v:RecipientsView/>
+                        <v:RecipientEditor Grid.Column="1"/>
+                    </Grid>
+                    
                 </DockPanel>
             </TabItem>
 
@@ -119,7 +126,7 @@
                                     </Style>
                                 </StackPanel.Resources>
 
-                                <Button ToolTip="Отправить сразу" Click="OnSendButtonClick">
+                                <Button ToolTip="Отправить сразу" Command="{Binding SendMailCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <fa:ImageAwesome Icon="Regular_Envelope" Height="12" Foreground="DarkBlue"/>
                                         <TextBlock Text="Отправить" Margin="5,0,0,0"/>
@@ -209,14 +216,16 @@
             <TabItem Header="Письма" x:Name="tabLetters">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
+                        <ColumnDefinition Width="36.667" MaxWidth="400"/>
+                        <ColumnDefinition Width="163.333"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Grid.Column="0" Header="Список писем">
-                        <ListBox x:Name="MessagesList" ItemsSource="{x:Static data:TestData.Messages}" 
+                    <GroupBox Grid.Column="0" Header="Список писем" Grid.ColumnSpan="2">
+                        <ListBox x:Name="MessagesList" ItemsSource="{Binding Messages}" 
+                                 SelectedItem="{Binding SelectedMessage}"
                                  DisplayMemberPath="Subject"/>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="Редактор">
+                    <GroupBox Grid.Column="2" Header="Редактор">
                         <DockPanel>
                             <GroupBox Header="Заголовок" DockPanel.Dock="Top">
                                 <TextBox x:Name="letterTitle"
@@ -258,7 +267,7 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Column="0" Grid.Row="0" Text="Число отправленных писем:"/>
-                    <TextBlock Grid.Column="1" Grid.Row="0" Text="5"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding Statistic.SendMessagesCount}"/>
 
                     <TextBlock Grid.Column="0" Grid.Row="1" Text="Число отправителей в базе:"/>
                     <TextBlock Grid.Column="1" Grid.Row="1" Text="5"/>
