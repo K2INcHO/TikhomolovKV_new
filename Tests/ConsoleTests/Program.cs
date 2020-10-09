@@ -7,7 +7,7 @@ namespace ConsoleTests
         static void Main(string[] args)
         {
             //ThreadTests.Start();
-            CriticalSelectionTests.Start();
+            ThreadPoolTests.Start();
 
             Console.WriteLine("Главный поток работу закончил!");
             Console.ReadLine();
