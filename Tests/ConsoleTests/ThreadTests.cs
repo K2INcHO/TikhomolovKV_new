@@ -46,8 +46,8 @@ namespace ConsoleTests
             Console.WriteLine("Останавливаю время...");
 
             //останавливаем поток...
-            var current_process = System.Diagnostics.Process.GetCurrentProcess();
-            Process.Start("calc.exe"); //управление процессами ОС (вызов калькулятора например)//
+            //var current_process = System.Diagnostics.Process.GetCurrentProcess();
+            //Process.Start("calc.exe"); //управление процессами ОС (вызов калькулятора например)//
 
             timer_thread.Priority = ThreadPriority.BelowNormal;
 
