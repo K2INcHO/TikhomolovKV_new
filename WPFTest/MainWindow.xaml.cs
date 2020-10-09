@@ -12,10 +12,16 @@ namespace WPFTest
             new Thread(() =>
             {
                 var result = GetResultHard();
-                Application.Current.Dispatcher.Invoke(() => ResultText.Text = result);
-                ResultText.Text = GetResultHard();
+                UpdateResultValue(result);
             }) { IsBackground = true}.Start();
-            
+        }
+
+        private void UpdateResultValue(string Result)
+        {
+            if (Dispatcher.CheckAccess())
+                ResultText.Text = Result;
+            else
+                Dispatcher.Invoke(() => UpdateResultValue(Result));
         }
 
         private string GetResultHard()
