@@ -34,13 +34,18 @@ namespace ConsoleTests
             Console.ReadLine();
             starter.Set();
             Console.ReadLine();
-            starter.Set();
-            Console.ReadLine();
-            starter.Set();
-            Console.ReadLine();
-            starter.Set();
-            Console.ReadLine();
 
+            //Mutex - именованный объект ядра системы
+            //Mutex mutex1 = new Mutex(true, "Тестовый мютекс", out var created1);
+            //Mutex mutex2 = new Mutex(true, "Тестовый мютекс", out var created2);
+
+            //mutex1.WaitOne();       //застрянет до тех пор пока кто-то не освободит мютекс
+            //mutex1.ReleaseMutex();  
+
+            //var semaphore = new Semaphore(0, 10);   //мютекс в который можно войти много раз
+
+            //semaphore.WaitOne();
+            //semaphore.Release();
         }
 
         private static void LockSynchronizationTest()
