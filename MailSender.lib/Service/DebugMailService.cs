@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using MailSender.lib.Interfaces;
+using System.Collections.Generic;
 
 namespace MailSender.lib.Service
 {
@@ -25,7 +26,7 @@ namespace MailSender.lib.Service
             private readonly string _Login;
             private readonly string _Password;
 
-            public DebugMailSender (string Address, int Port, bool SSL, string Login, string Password)
+            public DebugMailSender(string Address, int Port, bool SSL, string Login, string Password)
             {
                 _Address = Address;
                 _Port = Port;
@@ -34,13 +35,24 @@ namespace MailSender.lib.Service
                 _Password = Password;
             }
 
-            public void Send (string SenderAddress, string RecipientAddress, string Subject, string Body)
-                {
-                    Debug.WriteLine("Отправка почты через сервер {0}:{1} SSL:{2} (Login:{3}; Pass:{4})",
-                        _Address, _Port, _SSL,_Login,_Password);
-                    Debug.WriteLine("Сообщение от {0} к {1}:\r\n{2}\r\n{3}",
-                        SenderAddress, RecipientAddress, Subject, Body);
-                }
+            public void Send(string SenderAddress, string RecipientAddress, string Subject, string Body)
+            {
+                Debug.WriteLine("Отправка почты через сервер {0}:{1} SSL:{2} (Login:{3}; Pass:{4})",
+                    _Address, _Port, _SSL, _Login, _Password);
+                Debug.WriteLine("Сообщение от {0} к {1}:\r\n{2}\r\n{3}",
+                    SenderAddress, RecipientAddress, Subject, Body);
             }
+
+            public void Send(string SenderAddress, IEnumerable<string> RecipientsAddress, string Subject, string Body)
+            {
+                foreach (var recipient_address in RecipientsAddress)
+                    Send(SenderAddress, recipient_address, Subject, Body);
+            }
+
+            public void SendParallel(string SenderAddress, IEnumerable<string> RecipientsAddress, string Subject, string Body)
+            {
+                Send(SenderAddress, RecipientsAddress, Subject, Body)
+            }
+        }
     }
 }
