@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 
 namespace ConsoleTests
@@ -18,6 +19,8 @@ namespace ConsoleTests
             timer_thread.Name = "Поток часов";
             timer_thread.IsBackground = true;           //устанавливаем отметку для потока что он фоновый
             timer_thread.Start();       //командуем объекту Thread чтобы он запустил поток (стал горячим)
+
+            //timer_thread.Interrupt();
 
             //var printer_thread = new Thread(PrintMessage)
             //{
@@ -41,6 +44,30 @@ namespace ConsoleTests
             //}
 
             Console.WriteLine("Главный поток работу закончил!");
+            Console.ReadLine();
+
+            Console.WriteLine("Останавливаю время...");
+
+            //останавливаем поток...
+            var current_process = System.Diagnostics.Process.GetCurrentProcess();
+            Process.Start("calc.exe"); //управление процессами ОС (вызов калькулятора например)//
+
+            timer_thread.Priority = ThreadPriority.BelowNormal;
+
+            __TimeWork = false;     //сбрасываем флаг
+
+            //блокируем основной поток, пока таймер не завершится
+            if (!timer_thread.Join(100))
+                timer_thread.Interrupt();
+            //if (!timer_thread.IsAlive)
+            //    timer_thread.Abort(); //Abort больше не работает в .Net Core
+
+
+            //timer_thread.Abort();
+            timer_thread.Interrupt();
+
+
+
             Console.ReadLine();
         }
 
@@ -71,14 +98,16 @@ namespace ConsoleTests
             }
         }
 
+        private static bool __TimeWork = true; //делаем флаг, на который поток будет обращать внимание
+
         private static void TimerMethod()
         {
             PrintThreadInfo();
-            while (true)
+            while (__TimeWork)
             {
                 Console.Title = DateTime.Now.ToString("HH:mm:ss:ffff");
                 Thread.Sleep(100); // усыпляем поток на 100мс
-                //Thread.SpinWait(10); // остановка потока, но без его усыпления
+                //Thread.SpinWait(10); // остановка потока, но без его усыпления (поток ждет)
             }
         }
 
