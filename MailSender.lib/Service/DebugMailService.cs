@@ -51,7 +51,7 @@ namespace MailSender.lib.Service
 
             public void SendParallel(string SenderAddress, IEnumerable<string> RecipientsAddress, string Subject, string Body)
             {
-                Send(SenderAddress, RecipientsAddress, Subject, Body)
+                Send(SenderAddress, RecipientsAddress, Subject, Body);
             }
         }
     }
