@@ -4,6 +4,9 @@ using System.Net.Mail;
 using MailSender.lib.Interfaces;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using System;
+using System.Linq;
 
 namespace MailSender.lib.Service
 {
@@ -84,6 +87,74 @@ namespace MailSender.lib.Service
         {
             foreach (var recipient_address in RecipientsAddresses)
                 ThreadPool.QueueUserWorkItem(o => Send(SenderAddress, recipient_address, Subject, Body));
+        }
+
+        public async Task SendAsync(
+            string SenderAddress, string RecipientAddress, string Subject, string Body, 
+            CancellationToken Cancel = default)
+        {
+            var from = new MailAddress(SenderAddress);      //от кого отправляем
+            var to = new MailAddress(RecipientAddress);     //кому отправляем 
+
+            //создаем почтовое отправление
+            using (var message = new MailMessage(from, to))
+            {
+                message.Subject = Subject;      //тема письма
+                message.Body = Body;            //текст письма
+
+                //создаем клиента SMTP почты, через который будет отправляться почта
+                using (var client = new SmtpClient(_Address, _Port))
+                {
+                    client.EnableSsl = _SSL;
+
+                    //указываем учетные данные почты клиента
+                    client.Credentials = new NetworkCredential
+                    {
+                        UserName = _Login,
+                        Password = _Password
+                    };
+
+                    //отправляем сообщение
+                    try
+                    {
+                        //client.Send(message);
+                        Cancel.ThrowIfCancellationRequested();
+
+                        await client.SendMailAsync(message).ConfigureAwait(false);
+                    }
+                    catch (SmtpException e)
+                    {
+                        Trace.TraceError(e.ToString());
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public async Task SendAsync(
+            string SenderAddress, IEnumerable<string> RecipientsAddresses, string Subject, string Body, 
+            IProgress<(string Recipient, double Percent)> Progress = null, CancellationToken Cancel = default)
+        {
+            var recipients = RecipientsAddresses.ToArray();
+
+            for (int i = 0, count = recipients.Length; i < count; i++)
+            {
+                Cancel.ThrowIfCancellationRequested();
+
+                await SendAsync(SenderAddress, recipients[i], Subject, Body, Cancel).ConfigureAwait(false);
+
+                Progress?.Report((recipients[i], i / (double)count));
+            }
+        }
+
+        public async Task SendParallelAsync(
+            string SenderAddress, IEnumerable<string> RecipientsAddress, string Subject, string Body, 
+            CancellationToken Cancel = default)
+        {
+            var tasks = RecipientsAddress
+                .Select(recipient_address => SendAsync(SenderAddress, recipient_address, Subject, Body, Cancel));
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }
