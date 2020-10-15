@@ -28,33 +28,6 @@ namespace WPFTest
 
             if (dialog.ShowDialog() != true) return;
 
-            //var dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            //using(var reader = new StreamReader(dialog.FileName))
-            //{
-            //    while (!reader.EndOfStream)
-            //    {
-            //        var line = await reader.ReadLineAsync().ConfigureAwait(false);
-            //        var words = line.Split(' ');
-            //        //Thread.Sleep(100);
-            //        //await Task.Delay(1);
-
-            //        foreach (var word in words)
-            //            if (dict.ContainsKey(word))
-            //                dict[word]++;
-            //            else
-            //                dict.Add(word, 1);
-
-            //        //ProgressInfo.Value = reader.BaseStream.Position / (double)reader.BaseStream.Length;
-            //        ProgressInfo.Dispatcher.Invoke(() =>
-            //            ProgressInfo.Value = reader.BaseStream.Position / (double)reader.BaseStream.Length);
-            //    }
-            //}
-
-            //var count = Dictionary.Count;
-            //Result.Text = $"Число слов {Count}";
-            //Result.Dispatcher.Invoke(() => Result.Text = $"Число слов {Count}");
-
             StartAction.IsEnabled = false;
             CancelAction.IsEnabled = true;
 
@@ -81,9 +54,15 @@ namespace WPFTest
 
         private static async Task<int> GetWordsCountAsync(string FileName, IProgress<double> Progress = null, CancellationToken Cancel = default)
         {
-            // Мы находимся в ThreadId == 7 (например)
-            await Task.Yield();
-            // Теперь мы в ThreadId == 12 (например) (а, возможно и обратно в 7)
+            // Мы находимся в ThreadId == 1
+
+            var thread_id = Thread.CurrentThread.ManagedThreadId;
+
+            await Task.Yield().ConfigureAwait(false);
+
+            var thread_id2 = Thread.CurrentThread.ManagedThreadId;
+
+            // Мы находимся в ThreadId == 1
 
             var dict = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
@@ -97,7 +76,7 @@ namespace WPFTest
                     // .ConfigureAwait(false); - требование "вернуться" в произвольный поток из пула потоков
                     var words = line.Split(' ');
                     //Thread.Sleep(100);
-                    await Task.Delay(1);
+                    //await Task.Delay(1, Cancel).ConfigureAwait(false);
 
                     foreach (var word in words)
                         if (dict.ContainsKey(word))
@@ -108,12 +87,19 @@ namespace WPFTest
                     Progress?.Report(reader.BaseStream.Position / (double)reader.BaseStream.Length);
                 }
             }
+
+            var thread_id3 = Thread.CurrentThread.ManagedThreadId;
+            
+            await Application.Current.Dispatcher();
+
+            var thread_id4 = Thread.CurrentThread.ManagedThreadId;
+
             return dict.Count;
         }
 
         private CancellationTokenSource _ReadingFileCancellation;
 
-        private void OnCancelReadingClick(object sender, RoutedEventArgs e)
+        private void OnCancelReadingClick(object Sender, RoutedEventArgs e)
         {
             _ReadingFileCancellation?.Cancel();
         }
