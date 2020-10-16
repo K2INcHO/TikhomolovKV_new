@@ -90,7 +90,7 @@ namespace WPFTest
 
             var thread_id3 = Thread.CurrentThread.ManagedThreadId;
             
-            await Application.Current.Dispatcher();
+            //await Application.Current.Dispatcher();
 
             var thread_id4 = Thread.CurrentThread.ManagedThreadId;
 
