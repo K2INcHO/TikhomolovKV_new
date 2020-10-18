@@ -2,8 +2,10 @@
 using MailSender.lib.Interfaces;
 using MailSender.lib.Service;
 using MailSender.ViewModels;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace MailSender
 {
@@ -16,6 +18,14 @@ namespace MailSender
         //создаем приложение при помощи "построителя хоста"
         public static IHost Hosting => _Hosting
             ??= Host.CreateDefaultBuilder(Environment.GetCommandLineArgs())
+            .ConfigureAppConfiguration(cfg => cfg
+                .AddJsonFile("appconfig.json", true, true)
+                .AddXmlFile("appsettings.xml", true, true)
+            )
+            .ConfigureLogging(log => log
+                .AddConsole()
+                .AddDebug()
+            )
             .ConfigureServices(ConfigureServices)
             .Build();
 

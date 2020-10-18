@@ -30,9 +30,8 @@ namespace ConsoleTests
 
             using (var db = new StudentsDB(new DbContextOptionsBuilder<StudentsDB>().UseSqlServer(connection_str).Options))
             {
-                await db.Database.MigrateAsync();
-
                 //await db.Database.EnsureCreatedAsync();
+                await db.Database.MigrateAsync();
 
                 var students_count = await db.Students.CountAsync();
 
