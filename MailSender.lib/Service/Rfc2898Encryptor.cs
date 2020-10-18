@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Security.Cryptography;
 using MailSender.lib.Interfaces;
+using MailSender.lib.Models;
 
 namespace MailSender.lib.Service
 {
@@ -17,6 +18,11 @@ namespace MailSender.lib.Service
         };
 
         public Encoding Encoding { get; set; } = Encoding.UTF8;
+
+        //public Rfc2898Encryptor(IStore<Recipient> Recipients)
+        //{
+
+        //} 
 
         private static ICryptoTransform GetAlgorithm(string password)
         {
