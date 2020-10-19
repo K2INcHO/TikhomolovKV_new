@@ -16,7 +16,7 @@ namespace WPFTest
         private async void OnOpenFileClick(object sender, RoutedEventArgs e)
         {
             //Мы находились в ThreadID == 1
-            await Task.Yield(); //Даем время на обработку сообщений пользовательского интерфейсаа
+            await Task.Yield(); //Даем время на обработку сообщений пользовательского интерфейса (разрываем метод и даем возможность вклиниться чему-то, использовавшему этот поток)
             //Мы снова в ThreadID == 1
 
             var dialog = new OpenFileDialog
@@ -65,7 +65,7 @@ namespace WPFTest
 
             try
             {
-                var count = await GetWordsCountAsync(dialog.FileName, progress, cancel);
+                var count = await GetWordsCountAsync(dialog.FileName, progress, cancel).ConfigureAwait(true);
                 Result.Text = $"Число слов {count}";
             }
             catch(OperationCanceledException)
@@ -97,7 +97,7 @@ namespace WPFTest
                     // .ConfigureAwait(false); - требование "вернуться" в произвольный поток из пула потоков
                     var words = line.Split(' ');
                     //Thread.Sleep(100);
-                    await Task.Delay(10);
+                    await Task.Delay(1);
 
                     foreach (var word in words)
                         if (dict.ContainsKey(word))
